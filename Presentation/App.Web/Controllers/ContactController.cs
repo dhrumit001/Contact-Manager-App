@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace App.Web.Controllers
 {
-    public class ContactController : Controller
+    public class ContactController : BaseController
     {
         private readonly IContactService _contactService;
         private readonly IRepository<Contact> _contactRepository;
@@ -39,13 +39,13 @@ namespace App.Web.Controllers
             return View(model);
         }
 
-        //[HttpPost]
+        [HttpPost]
         public async Task<IActionResult> ContactList(ContactSearchModel searchModel)
         {
             //prepare model
             var model = await PrepareContactListModel(searchModel);
 
-            return Json(model);
+            return DataTableJson(model);
         }
 
         public IActionResult Create()
