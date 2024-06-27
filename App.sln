@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.10.35013.160
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "App.Web", "Presentation\App.Web\App.Web.csproj", "{6B35732F-E441-4D2A-897C-1F046BA9A027}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Libraries", "Libraries", "{7BB6C642-6FF5-47C6-827E-6FA8A4848FCB}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Presentation", "Presentation", "{C3EC0B06-0FBD-471A-A4F8-BF396EBDCE4F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{2A8C9C65-44CC-462B-AAAE-4095010C426D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{6B35732F-E441-4D2A-897C-1F046BA9A027}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6B35732F-E441-4D2A-897C-1F046BA9A027}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6B35732F-E441-4D2A-897C-1F046BA9A027}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6B35732F-E441-4D2A-897C-1F046BA9A027}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{6B35732F-E441-4D2A-897C-1F046BA9A027} = {C3EC0B06-0FBD-471A-A4F8-BF396EBDCE4F}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {583968DD-56A7-4F26-A80F-84A0843007FC}
+	EndGlobalSection
+EndGlobal
