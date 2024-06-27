@@ -25,7 +25,7 @@ namespace App.Data.Mappings
             builder.Property(s => s.EmailAddress).IsRequired().HasMaxLength(100);
             builder.Property(s => s.PhoneNumber).IsRequired().HasMaxLength(100);
 
-            builder.HasMany(c => c.ContactAddresses)
+            builder.HasOne(c => c.ContactAddress)
                 .WithOne(e => e.Contact);
         }
     }

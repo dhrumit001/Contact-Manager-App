@@ -98,51 +98,6 @@ namespace App.Web.Controllers
 
         #endregion
 
-        #region Contact Address
-
-        [HttpPost]
-        public async Task<IActionResult> AddContactAddress(ContactAddressModel model)
-        {
-            if (!ModelState.IsValid)
-                return View(model);
-
-            var contactEntity = new Address
-            {
-                City = model.City,
-                ContactId = model.ContactId,
-                Country = model.Country,
-                State = model.State,
-                Street = model.Street,
-                ZipPostalCode = model.ZipPostalCode
-            };
-
-            await _contactService.InsertAddressAsync(contactEntity);
-
-            ViewBag.SuccessNotification = "Contact Address added successfully.";
-            return RedirectToAction(nameof(List));
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> UpdateContactAddress(ContactAddressModel model)
-        {
-            if (!ModelState.IsValid)
-                return View(model);
-
-
-            var address = await _addressRepository.GetByIdAsync(model.Id);
-            address.City = model.City;
-            address.Country = model.Country;
-            address.State = model.State;
-            address.Street = model.Street;
-            address.ZipPostalCode = model.ZipPostalCode;
-            await _contactService.UpdateAddressAsync(address);
-
-            ViewBag.SuccessNotification = "Contact Address updated successfully.";
-            return RedirectToAction(nameof(List));
-        }
-
-        #endregion
-
         #region Utilities()
 
         public async Task<ContactListModel> PrepareContactListModel(ContactSearchModel searchModel)
@@ -178,6 +133,5 @@ namespace App.Web.Controllers
         }
 
         #endregion
-
     }
 }

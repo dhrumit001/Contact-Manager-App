@@ -8,7 +8,7 @@ namespace App.Services.Tests.Contacts
 {
     public class ContactServiceTests : ServiceTestBase
     {
-        private IContactService? _contactService;
+        private IContactService _contactService;
         private IRepository<Contact>? _contactRepository;
         private IRepository<Address>? _adressRepository;
 
