@@ -19,11 +19,11 @@ namespace App.Data.Mappings
             builder.ToTable(nameof(Address));
             builder.HasKey(s => s.Id);
 
-            builder.Property(s => s.Country).IsRequired().HasMaxLength(100);
-            builder.Property(s => s.State).IsRequired().HasMaxLength(100);
-            builder.Property(s => s.City).IsRequired().HasMaxLength(100);
-            builder.Property(s => s.Street).IsRequired().HasMaxLength(500);
-            builder.Property(s => s.ZipPostalCode).IsRequired().HasMaxLength(50);
+            builder.Property(s => s.Country).HasMaxLength(100);
+            builder.Property(s => s.State).HasMaxLength(100);
+            builder.Property(s => s.City).HasMaxLength(100);
+            builder.Property(s => s.Street).HasMaxLength(500);
+            builder.Property(s => s.ZipPostalCode).HasMaxLength(50);
         }
     }
 }

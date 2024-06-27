@@ -4,23 +4,27 @@ using App.Core.Domain.Contacts;
 using App.Web.Extensions;
 using App.Web.Models.Contact;
 using Microsoft.AspNetCore.Mvc;
+using AutoMapper;
 
 namespace App.Web.Controllers
 {
-    public class ContactController : Controller
+    public class ContactController : BaseController
     {
         private readonly IContactService _contactService;
         private readonly IRepository<Contact> _contactRepository;
         private readonly IRepository<Address> _addressRepository;
+        private readonly IMapper _mapper;
 
         public ContactController(IContactService contactService,
             IRepository<Contact> contactRepository,
-            IRepository<Address> addressRepository
+            IRepository<Address> addressRepository,
+            IMapper mapper
             )
         {
             _contactService = contactService;
             _contactRepository = contactRepository;
             _addressRepository = addressRepository;
+            _mapper = mapper;
         }
 
         #region Contacts
@@ -39,13 +43,13 @@ namespace App.Web.Controllers
             return View(model);
         }
 
-        //[HttpPost]
+        [HttpPost]
         public async Task<IActionResult> ContactList(ContactSearchModel searchModel)
         {
             //prepare model
             var model = await PrepareContactListModel(searchModel);
 
-            return Json(model);
+            return DataTableJson(model);
         }
 
         public IActionResult Create()
@@ -98,51 +102,6 @@ namespace App.Web.Controllers
 
         #endregion
 
-        #region Contact Address
-
-        [HttpPost]
-        public async Task<IActionResult> AddContactAddress(ContactAddressModel model)
-        {
-            if (!ModelState.IsValid)
-                return View(model);
-
-            var contactEntity = new Address
-            {
-                City = model.City,
-                ContactId = model.ContactId,
-                Country = model.Country,
-                State = model.State,
-                Street = model.Street,
-                ZipPostalCode = model.ZipPostalCode
-            };
-
-            await _contactService.InsertAddressAsync(contactEntity);
-
-            ViewBag.SuccessNotification = "Contact Address added successfully.";
-            return RedirectToAction(nameof(List));
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> UpdateContactAddress(ContactAddressModel model)
-        {
-            if (!ModelState.IsValid)
-                return View(model);
-
-
-            var address = await _addressRepository.GetByIdAsync(model.Id);
-            address.City = model.City;
-            address.Country = model.Country;
-            address.State = model.State;
-            address.Street = model.Street;
-            address.ZipPostalCode = model.ZipPostalCode;
-            await _contactService.UpdateAddressAsync(address);
-
-            ViewBag.SuccessNotification = "Contact Address updated successfully.";
-            return RedirectToAction(nameof(List));
-        }
-
-        #endregion
-
         #region Utilities()
 
         public async Task<ContactListModel> PrepareContactListModel(ContactSearchModel searchModel)
@@ -152,7 +111,7 @@ namespace App.Web.Controllers
 
             //get contacts
             var contacts = await _contactService.GetAllContactsAsync(
-                email: searchModel.SearchEmail,
+                emailAddress: searchModel.SearchEmailAddress,
                 name: searchModel.SearchName,
                 phoneNumber: searchModel.SearchPhoneNumber,
                 pageIndex: searchModel.Page - 1, pageSize: searchModel.PageSize);
@@ -178,6 +137,5 @@ namespace App.Web.Controllers
         }
 
         #endregion
-
     }
 }

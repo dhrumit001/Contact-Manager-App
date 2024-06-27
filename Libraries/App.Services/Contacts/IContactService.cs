@@ -1,10 +1,5 @@
 ﻿using App.Core;
 using App.Core.Domain.Contacts;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace App.Services.Contacts
 {
@@ -25,7 +20,7 @@ namespace App.Services.Contacts
         /// <summary>
         /// Gets all contacts
         /// </summary>
-        /// <param name="email">email; null to load all contacts</param>
+        /// <param name="emailAddress">email; null to load all contacts</param>
         /// <param name="name">name; null to load all contacts</param>
         /// <param name="phoneNumber">phone number; null to load all contacts</param>
         /// <param name="pageIndex">Page index</param>
@@ -36,7 +31,7 @@ namespace App.Services.Contacts
         /// The task result contains the contacts
         /// </returns>
         Task<IPagedList<Contact>> GetAllContactsAsync(
-            string? email = null, string? name = null, string? phoneNumber = null,
+            string emailAddress = null, string name = null, string phoneNumber = null,
             int pageIndex = 0, int pageSize = int.MaxValue, bool getOnlyTotalCount = false);
 
         /// <summary>
@@ -77,13 +72,6 @@ namespace App.Services.Contacts
         /// <param name="address">Address</param>
         /// <returns>A task that represents the asynchronous operation</returns>
         Task UpdateAddressAsync(Address address);
-
-        /// <summary>
-        /// Validate add address (as per business logic)
-        /// </summary>
-        /// <param name="address">Address</param>
-        /// <returns>return true in case of allow to add address otherwise false</returns>
-        bool CanAddAddress(Address address);
 
         #endregion
     }

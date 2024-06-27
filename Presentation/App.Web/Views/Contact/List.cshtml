@@ -1,0 +1,76 @@
+﻿@using App.Web.Models.Contact
+@model ContactSearchModel
+@{
+    ViewData["Title"] = "Contact List";
+    Layout = "~/Views/shared/_layout.cshtml";
+}
+
+<div class="container card-container">
+    <div class="row">
+        <h3>
+            Contacts
+        </h3>
+    </div>
+    <div class="row">
+        <div class="accordion">
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="panel-search-contact">
+                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#panel-search-contact-child" aria-expanded="true" aria-controls="panel-search-contact-child">
+                        Search Contact
+                    </button>
+                </h2>
+                <div id="panel-search-contact-child" class="accordion-collapse collapse show" aria-labelledby="panel-search-contact">
+                    <div class="accordion-body">
+                        <div class="row">
+                            <div class="col">
+                                <input asp-for="SearchName" class="form-control" placeholder="Name" />
+                            </div>
+                            <div class="col">
+                                <input asp-for="SearchEmailAddress" class="form-control" placeholder="Email" />
+                            </div>
+                            <div class="col">
+                                <input asp-for="SearchPhoneNumber" class="form-control" placeholder="Phone" />
+                            </div>
+                        </div>
+                        <div class="row mt-3">
+                            <div class="col-12 text-center">
+                                <button type="button" class="btn btn-primary" id="search-contacts">Search</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row mt-3">
+        @{
+            var gridModel = new DataTablesModel
+            {
+                Name = "contact-grid",
+                UrlRead = new DataUrl("ContactList", "Contact", null),
+                SearchButtonId = "search-contacts",
+                Length = Model.PageSize,
+                LengthMenu = Model.AvailablePageSizes,
+                Filters = new List<FilterParameter>
+                {
+                    new FilterParameter(nameof(Model.SearchName)),
+                    new FilterParameter(nameof(Model.SearchEmailAddress)),
+                    new FilterParameter(nameof(Model.SearchPhoneNumber))
+                },
+            };
+            gridModel.ColumnCollection.Add(new ColumnProperty(nameof(ContactModel.Name))
+            {
+                Title = "Name"
+            });
+            gridModel.ColumnCollection.Add(new ColumnProperty(nameof(ContactModel.EmailAddress))
+            {
+                Title = "Email"
+            });
+            gridModel.ColumnCollection.Add(new ColumnProperty(nameof(ContactModel.PhoneNumber))
+            {
+                Title = "Phone",
+            });
+            @await Html.PartialAsync("Table", gridModel)
+        }
+    </div>
+</div>
