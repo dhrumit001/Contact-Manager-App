@@ -15,7 +15,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "App.Core", "Libraries\App.C
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "App.Data", "Libraries\App.Data\App.Data.csproj", "{6484FF66-EB1A-40A3-AC23-F194C79535FD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "App.Services", "Presentation\App.Services\App.Services.csproj", "{52A7E946-3F57-4929-BBC1-B990FB8352BC}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "App.Services", "Libraries\App.Services\App.Services.csproj", "{52A7E946-3F57-4929-BBC1-B990FB8352BC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
