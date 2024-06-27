@@ -7,7 +7,7 @@
     {
         public string SearchName { get; set; }
 
-        public string SearchEmail { get; set; }
+        public string SearchEmailAddress { get; set; }
 
         public string SearchPhoneNumber { get; set; }
     }

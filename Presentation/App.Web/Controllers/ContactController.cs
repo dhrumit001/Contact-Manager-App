@@ -111,7 +111,7 @@ namespace App.Web.Controllers
 
             //get contacts
             var contacts = await _contactService.GetAllContactsAsync(
-                email: searchModel.SearchEmail,
+                emailAddress: searchModel.SearchEmailAddress,
                 name: searchModel.SearchName,
                 phoneNumber: searchModel.SearchPhoneNumber,
                 pageIndex: searchModel.Page - 1, pageSize: searchModel.PageSize);

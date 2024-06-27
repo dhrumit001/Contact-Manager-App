@@ -54,7 +54,7 @@ namespace App.Services.Contacts
         /// <summary>
         /// Gets all contacts
         /// </summary>
-        /// <param name="email">email; null to load all contacts</param>
+        /// <param name="emailAddress">email; null to load all contacts</param>
         /// <param name="name">name; null to load all contacts</param>
         /// <param name="phoneNumber">phone number; null to load all contacts</param>
         /// <param name="pageIndex">Page index</param>
