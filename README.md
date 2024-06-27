@@ -32,6 +32,7 @@ Note: This command will create the database (if it does not already exist) and a
 - Entity Framework Core
 - NUnit (For unit testing)
 - DataTable (for UI grid)
+- AutoMapper (for mapping entities to model)
 
 ## Architecture and Design Patterns Used
 

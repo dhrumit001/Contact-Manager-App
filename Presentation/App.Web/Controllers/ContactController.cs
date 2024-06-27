@@ -4,6 +4,7 @@ using App.Core.Domain.Contacts;
 using App.Web.Extensions;
 using App.Web.Models.Contact;
 using Microsoft.AspNetCore.Mvc;
+using AutoMapper;
 
 namespace App.Web.Controllers
 {
@@ -12,15 +13,18 @@ namespace App.Web.Controllers
         private readonly IContactService _contactService;
         private readonly IRepository<Contact> _contactRepository;
         private readonly IRepository<Address> _addressRepository;
+        private readonly IMapper _mapper;
 
         public ContactController(IContactService contactService,
             IRepository<Contact> contactRepository,
-            IRepository<Address> addressRepository
+            IRepository<Address> addressRepository,
+            IMapper mapper
             )
         {
             _contactService = contactService;
             _contactRepository = contactRepository;
             _addressRepository = addressRepository;
+            _mapper = mapper;
         }
 
         #region Contacts

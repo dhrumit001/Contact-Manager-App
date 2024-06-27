@@ -26,6 +26,9 @@ namespace App.Web
             // Add other services here (e.g., for dependency injection)
             services.AddScoped<IContactService, ContactService>();
             services.AddScoped(typeof(IRepository<>), typeof(EfRepository<>));
+
+            // Auto register all profiles in the assembly
+            services.AddAutoMapper(typeof(Startup));
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
