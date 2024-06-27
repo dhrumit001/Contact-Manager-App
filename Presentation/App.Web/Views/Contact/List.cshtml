@@ -6,10 +6,16 @@
 }
 
 <div class="container card-container">
-    <div class="row">
-        <h3>
-            Contacts
-        </h3>
+
+    <div class="row mb-3">
+        <div class="col-6 text-start">
+            <h3>
+                Contacts
+            </h3>
+        </div>
+        <div class="col-6 text-end">
+            <a asp-action="Create" asp-controller="Contact" class="btn btn-primary"><i class="fa fa-plus me-1"></i>Add</a>
+        </div>
     </div>
     <div class="row">
         <div class="accordion">
@@ -42,6 +48,7 @@
             </div>
         </div>
     </div>
+
     <div class="row mt-3">
         @{
             var gridModel = new DataTablesModel
@@ -70,7 +77,51 @@
             {
                 Title = "Phone",
             });
-            @await Html.PartialAsync("Table", gridModel)
+            gridModel.ColumnCollection.Add(new ColumnProperty(nameof(ContactModel.Id))
+            {
+                Title = "Action",
+                ClassName = NopColumnClassDefaults.CenterAll,
+                Render = new RenderCustom("renderViewButton")
+            });
+                @await Html.PartialAsync("Table", gridModel)
         }
     </div>
 </div>
+
+<div id="modal-contact-view"></div>
+
+<script>
+    var modalPopup = null;
+    function renderViewButton(data, type, row, meta) {
+        return "<a href=\"javascript:void(0);\" onclick=\"loadContactViewPartial(" + data + ")\" class=\"btn btn-secondary\"><i class=\"fa fa-eye me-1\"></i>View</a>";
+    }
+
+    function loadContactViewPartial(id) {
+        $(".se-pre-con").show();
+        $.ajax({
+            url: '@Url.Action("LoadContactViewPartial", "Contact")',
+            async: false,
+            type: 'post',
+            dataType: 'json',
+            data: {
+                id: id
+            },
+            success: function (response) {
+                if (response.success) {
+                    $("#modal-contact-view").html(response.result);
+                    modalPopup = new bootstrap.Modal($('#view-contact'));
+                    modalPopup.show();
+                }
+                else
+                    showNotificationMessage("Error", response.message);
+            },
+            complete: function () {
+                $(".se-pre-con").hide();
+            },
+            error: function () {
+                showNotificationMessage("Error","Something went wrong please try after sometime.")
+                $(".se-pre-con").hide();
+            }
+        });
+    }
+</script>

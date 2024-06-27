@@ -20,6 +20,7 @@ namespace App.Web.Mapper
         private void ContactMap()
         {
             CreateMap<Contact, ContactModel>()
+            .ForMember(dest=>dest.Address,opt=>opt.MapFrom(src=>src.ContactAddress))
             .ReverseMap();
 
             CreateMap<Address, ContactAddressModel>()

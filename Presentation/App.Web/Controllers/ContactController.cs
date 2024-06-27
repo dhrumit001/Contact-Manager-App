@@ -4,6 +4,8 @@ using App.Core.Domain.Contacts;
 using App.Web.Extensions;
 using App.Web.Models.Contact;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Mvc.Razor;
 using AutoMapper;
 
 namespace App.Web.Controllers
@@ -18,8 +20,9 @@ namespace App.Web.Controllers
         public ContactController(IContactService contactService,
             IRepository<Contact> contactRepository,
             IRepository<Address> addressRepository,
-            IMapper mapper
-            )
+            IMapper mapper,
+            IRazorViewEngine razorViewEngine
+            ) : base(razorViewEngine)
         {
             _contactService = contactService;
             _contactRepository = contactRepository;
@@ -71,9 +74,52 @@ namespace App.Web.Controllers
             };
 
             await _contactService.InsertContactAsync(contactEntity);
+            if(contactEntity.Id > 0)
+            {
+                await _contactService.InsertAddressAsync(new Address()
+                {
+                    ContactId = contactEntity.Id,
+                    Street = model.Address?.Street,
+                    City = model?.Address?.City,
+                    State = model?.Address?.State,
+                    Country = model?.Address?.Country,
+                    ZipPostalCode = model.Address?.ZipPostalCode
+                });
+            }
 
             ViewBag.SuccessNotification = "Contact added successfully.";
             return RedirectToAction(nameof(List));
+        }
+
+        [HttpPost]
+        public async Task<JsonResult> LoadContactViewPartial(int id)
+        {
+
+            if(id > 0)
+            {
+                var contact = await _contactService.GetDetailsByIdAsync(id);
+
+                if (contact == null)
+                    return Json(new
+                    {
+                        success = false,
+                        message = "Contact does not exist"
+                    });
+
+                var model = _mapper.Map<ContactModel>(contact);
+
+                return Json(new
+                {
+                    Result = RenderPartialViewToString("_LoadContactViewPartial", model),
+                    Success = true
+                });
+            }
+
+            return Json(new
+            {
+                success = false,
+                message = "Contact does not exist"
+            });
         }
 
         [HttpPost]
@@ -82,23 +128,71 @@ namespace App.Web.Controllers
             if (!ModelState.IsValid)
                 return View(model);
 
-            var contact = await _contactRepository.GetByIdAsync(model.Id);
+            var contact = await _contactService.GetDetailsByIdAsync(model.Id);
+
+            if(contact is null)
+                return Json(new
+                {
+                    success = false,
+                    message = "Contact does not exist"
+                });
+
             contact.Name = model.Name;
             contact.EmailAddress = model.EmailAddress;
             contact.PhoneNumber = model.PhoneNumber;
 
             await _contactService.UpdateContactAsync(contact);
 
-            ViewBag.SuccessNotification = "Contact updated successfully.";
-            return RedirectToAction(nameof(List));
+            if(contact?.ContactAddress is not null)
+            {
+                contact.ContactAddress.Street = model?.Address?.Street;
+                contact.ContactAddress.City = model?.Address?.City;
+                contact.ContactAddress.State = model?.Address?.State;
+                contact.ContactAddress.Country = model?.Address?.Country;
+                contact.ContactAddress.ZipPostalCode = model?.Address?.ZipPostalCode;
+
+                await _contactService.UpdateAddressAsync(contact.ContactAddress);
+            }
+            else
+            {
+                await _contactService.InsertAddressAsync(new Address()
+                {
+                    ContactId = contact.Id,
+                    Street = model.Address?.Street,
+                    City = model?.Address?.City,
+                    State = model?.Address?.State,
+                    Country = model?.Address?.Country,
+                    ZipPostalCode = model.Address?.ZipPostalCode
+                });
+            }
+            return Json(new
+            {
+                success = true,
+                message = "Contact updated successfully."
+            });
         }
 
-        public async Task<IActionResult> View(int id)
+        [HttpPost]
+        public async Task<IActionResult> RemoveContact(int id)
         {
-            var contact = await _contactService.GetContactDetailsByIdAsync(id);
+            var contact = await _contactService.GetDetailsByIdAsync(id);
 
-            return View();
+            if (contact is null)
+                return Json(new
+                {
+                    success = false,
+                    message = "Contact does not exist"
+                });
+
+            await _contactService.DeleteContactAsync(contact);
+
+            return Json(new
+            {
+                success = true,
+                message = "Contact removed successfully."
+            });
         }
+
 
         #endregion
 

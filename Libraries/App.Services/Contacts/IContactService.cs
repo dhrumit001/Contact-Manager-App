@@ -15,7 +15,7 @@ namespace App.Services.Contacts
         /// </summary>
         /// <param name="contact">Contact</param>
         /// <returns>A task that represents the asynchronous operation and return contact</returns>
-        Task<Contact> GetContactDetailsByIdAsync(int id);
+        Task<Contact> GetDetailsByIdAsync(int id);
 
         /// <summary>
         /// Gets all contacts

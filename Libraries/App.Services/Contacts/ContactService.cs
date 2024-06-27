@@ -42,7 +42,7 @@ namespace App.Services.Contacts
         /// </summary>
         /// <param name="contact">Contact</param>
         /// <returns>A task that represents the asynchronous operation and return contact</returns>
-        public async Task<Contact> GetContactDetailsByIdAsync(int id)
+        public async Task<Contact> GetDetailsByIdAsync(int id)
         {
             var contact = await _contactRepository.Table
                 .Include(s => s.ContactAddress)
