@@ -34,31 +34,31 @@
             </div>
             <div class="modal-body">
                 <form id="frm-update-contact" class="row g-3">
-                    <div class="row">
+                    <div class="row mb-2">
                         <div class="col-md-4">
-                            <label asp-for="Name" class="form-label">Name</label>
+                            <label asp-for="Name" class="form-label">Name <span class="text-danger">*</span></label>
                             <input class="form-control" asp-for="Name">
                             <span asp-validation-for="Name"></span>
                         </div>
                         <div class="col-md-4">
-                            <label asp-for="EmailAddress" class="form-label">Email</label>
+                            <label asp-for="EmailAddress" class="form-label">Email <span class="text-danger">*</span></label>
                             <input type="email" class="form-control" asp-for="EmailAddress">
                             <span asp-validation-for="EmailAddress"></span>
                         </div>
                         <div class="col-md-4">
-                            <label asp-for="PhoneNumber" class="form-label">Phone</label>
+                            <label asp-for="PhoneNumber" class="form-label">Phone <span class="text-danger">*</span></label>
                             <input class="form-control" asp-for="PhoneNumber">
                             <span asp-validation-for="PhoneNumber"></span>
                         </div>
                     </div>
 
-                    <div class="row">
+                    <div class="row mb-2">
                         <div class="col-12">
                             <label asp-for="Address.Street" class="form-label">Street Address</label>
                             <textarea class="form-control" asp-for="Address.Street" placeholder="Street Address"></textarea>
                         </div>
                     </div>
-                    <div class="row">
+                    <div class="row mb-2">
                         <div class="col-6">
                             <label asp-for="Address.City" class="form-label">City</label>
                             <input class="form-control" asp-for="Address.City">
@@ -68,7 +68,7 @@
                             <input class="form-control" asp-for="Address.State">
                         </div>
                     </div>
-                    <div class="row">
+                    <div class="row mb-2">
                         <div class="col-6">
                             <label asp-for="Address.Country" class="form-label">Country</label>
                             <input class="form-control" asp-for="Address.Country">
@@ -138,7 +138,7 @@
 
             var postData = new FormData($('#frm-update-contact')[0]);
             postData.append("Id", parseInt('@Model.Id'));
-            //$(".se-pre-con").show();
+            $(".se-pre-con").show();
             $.ajax({
                 url: "@Url.Action("Update", "Contact")",
                 data: postData,
@@ -157,17 +157,18 @@
                     }
                 },
                 complete: function () {
-                    // $(".se-pre-con").hide();
+                     $(".se-pre-con").hide();
                 },
                 error: function () {
                     showNotificationMessage("Error", "Something went wrong please try after sometime.")
-                    //$(".se-pre-con").hide();
+                    $(".se-pre-con").hide();
                 }
             });
         });
 
         $("#btn-remove-contact").on('click', function () {
             if (confirm("Are you sure you want to remove contact?")) { 
+                $(".se-pre-con").show();
                 $.ajax({
                     url: "@Url.Action("RemoveContact", "Contact")",
                     data: {
@@ -186,11 +187,11 @@
                         }
                     },
                     complete: function () {
-                        // $(".se-pre-con").hide();
+                         $(".se-pre-con").hide();
                     },
                     error: function () {
                         showNotificationMessage("Error", "Something went wrong please try after sometime.")
-                        //$(".se-pre-con").hide();
+                        $(".se-pre-con").hide();
                     }
                 });
             }

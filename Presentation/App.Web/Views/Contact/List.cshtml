@@ -97,6 +97,7 @@
     }
 
     function loadContactViewPartial(id) {
+        $(".se-pre-con").show();
         $.ajax({
             url: '@Url.Action("LoadContactViewPartial", "Contact")',
             async: false,
@@ -115,11 +116,11 @@
                     showNotificationMessage("Error", response.message);
             },
             complete: function () {
-                //$(".se-pre-con").hide();
+                $(".se-pre-con").hide();
             },
             error: function () {
                 showNotificationMessage("Error","Something went wrong please try after sometime.")
-                //$(".se-pre-con").hide();
+                $(".se-pre-con").hide();
             }
         });
     }
