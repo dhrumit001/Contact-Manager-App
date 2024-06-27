@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 namespace App.Services.Contacts
 {
     /// <summary>
-    /// Customer service interface
+    /// Customer service where all business logic is appear.
     /// </summary>
     public class ContactService : IContactService
     {
