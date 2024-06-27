@@ -26,4 +26,8 @@
     <ProjectReference Include="..\..\Libraries\App.Services\App.Services.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <EditorConfigFiles Remove="D:\Contact-Manager-App\Presentation\App.Web\.editorconfig" />
+  </ItemGroup>
+
 </Project>
