@@ -6,6 +6,7 @@ using App.Web.Models.Contact;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.Razor;
+using AutoMapper;
 
 namespace App.Web.Controllers
 {
@@ -14,16 +15,19 @@ namespace App.Web.Controllers
         private readonly IContactService _contactService;
         private readonly IRepository<Contact> _contactRepository;
         private readonly IRepository<Address> _addressRepository;
+        private readonly IMapper _mapper;
 
         public ContactController(IContactService contactService,
             IRepository<Contact> contactRepository,
             IRepository<Address> addressRepository,
+            IMapper mapper,
             IRazorViewEngine razorViewEngine
             ) : base(razorViewEngine)
         {
             _contactService = contactService;
             _contactRepository = contactRepository;
             _addressRepository = addressRepository;
+            _mapper = mapper;
         }
 
         #region Contacts
@@ -93,7 +97,7 @@ namespace App.Web.Controllers
 
             if(id > 0)
             {
-                var contact = await _contactService.GetContactDetailsByIdAsync(id);
+                var contact = await _contactService.GetDetailsByIdAsync(id);
 
                 if (contact == null)
                     return Json(new
@@ -102,6 +106,7 @@ namespace App.Web.Controllers
                         message = "Contact does not exist"
                     });
 
+                var model = _mapper.Map<ContactModel>(contact);
 
                 return Json(new
                 {
@@ -109,6 +114,12 @@ namespace App.Web.Controllers
                     Success = true
                 });
             }
+
+            return Json(new
+            {
+                success = false,
+                message = "Contact does not exist"
+            });
         }
 
         [HttpPost]
@@ -117,23 +128,71 @@ namespace App.Web.Controllers
             if (!ModelState.IsValid)
                 return View(model);
 
-            var contact = await _contactRepository.GetByIdAsync(model.Id);
+            var contact = await _contactService.GetDetailsByIdAsync(model.Id);
+
+            if(contact is null)
+                return Json(new
+                {
+                    success = false,
+                    message = "Contact does not exist"
+                });
+
             contact.Name = model.Name;
             contact.EmailAddress = model.EmailAddress;
             contact.PhoneNumber = model.PhoneNumber;
 
             await _contactService.UpdateContactAsync(contact);
 
-            ViewBag.SuccessNotification = "Contact updated successfully.";
-            return RedirectToAction(nameof(List));
+            if(contact?.ContactAddress is not null)
+            {
+                contact.ContactAddress.Street = model?.Address?.Street;
+                contact.ContactAddress.City = model?.Address?.City;
+                contact.ContactAddress.State = model?.Address?.State;
+                contact.ContactAddress.Country = model?.Address?.Country;
+                contact.ContactAddress.ZipPostalCode = model?.Address?.ZipPostalCode;
+
+                await _contactService.UpdateAddressAsync(contact.ContactAddress);
+            }
+            else
+            {
+                await _contactService.InsertAddressAsync(new Address()
+                {
+                    ContactId = contact.Id,
+                    Street = model.Address?.Street,
+                    City = model?.Address?.City,
+                    State = model?.Address?.State,
+                    Country = model?.Address?.Country,
+                    ZipPostalCode = model.Address?.ZipPostalCode
+                });
+            }
+            return Json(new
+            {
+                success = true,
+                message = "Contact updated successfully."
+            });
         }
 
-        public async Task<IActionResult> View(int id)
+        [HttpPost]
+        public async Task<IActionResult> RemoveContact(int id)
         {
-            var contact = await _contactService.GetContactDetailsByIdAsync(id);
+            var contact = await _contactService.GetDetailsByIdAsync(id);
 
-            return View();
+            if (contact is null)
+                return Json(new
+                {
+                    success = false,
+                    message = "Contact does not exist"
+                });
+
+            await _contactService.DeleteContactAsync(contact);
+
+            return Json(new
+            {
+                success = true,
+                message = "Contact removed successfully."
+            });
         }
+
 
         #endregion
 
@@ -146,7 +205,7 @@ namespace App.Web.Controllers
 
             //get contacts
             var contacts = await _contactService.GetAllContactsAsync(
-                email: searchModel.SearchEmail,
+                emailAddress: searchModel.SearchEmailAddress,
                 name: searchModel.SearchName,
                 phoneNumber: searchModel.SearchPhoneNumber,
                 pageIndex: searchModel.Page - 1, pageSize: searchModel.PageSize);

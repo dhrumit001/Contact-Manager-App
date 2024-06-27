@@ -32,7 +32,7 @@
                                 <input asp-for="SearchName" class="form-control" placeholder="Name" />
                             </div>
                             <div class="col">
-                                <input asp-for="SearchEmail" class="form-control" placeholder="Email" />
+                                <input asp-for="SearchEmailAddress" class="form-control" placeholder="Email" />
                             </div>
                             <div class="col">
                                 <input asp-for="SearchPhoneNumber" class="form-control" placeholder="Phone" />
@@ -59,11 +59,11 @@
                 Length = Model.PageSize,
                 LengthMenu = Model.AvailablePageSizes,
                 Filters = new List<FilterParameter>
-        {
-        new FilterParameter(nameof(Model.SearchName)),
-        new FilterParameter(nameof(Model.SearchEmail)),
-        new FilterParameter(nameof(Model.SearchPhoneNumber))
-        },
+                {
+                    new FilterParameter(nameof(Model.SearchName)),
+                    new FilterParameter(nameof(Model.SearchEmailAddress)),
+                    new FilterParameter(nameof(Model.SearchPhoneNumber))
+                },
             };
             gridModel.ColumnCollection.Add(new ColumnProperty(nameof(ContactModel.Name))
             {
@@ -83,12 +83,15 @@
                 ClassName = NopColumnClassDefaults.CenterAll,
                 Render = new RenderCustom("renderViewButton")
             });
-            @await Html.PartialAsync("Table", gridModel)
+                @await Html.PartialAsync("Table", gridModel)
         }
     </div>
 </div>
 
+<div id="modal-contact-view"></div>
+
 <script>
+    var modalPopup = null;
     function renderViewButton(data, type, row, meta) {
         return "<a href=\"javascript:void(0);\" onclick=\"loadContactViewPartial(" + data + ")\" class=\"btn btn-secondary\"><i class=\"fa fa-eye me-1\"></i>View</a>";
     }
@@ -102,8 +105,14 @@
             data: {
                 id: id
             },
-            success: function (result) {
-
+            success: function (response) {
+                if (response.success) {
+                    $("#modal-contact-view").html(response.result);
+                    modalPopup = new bootstrap.Modal($('#view-contact'));
+                    modalPopup.show();
+                }
+                else
+                    showNotificationMessage("Error", response.message);
             },
             complete: function () {
                 //$(".se-pre-con").hide();

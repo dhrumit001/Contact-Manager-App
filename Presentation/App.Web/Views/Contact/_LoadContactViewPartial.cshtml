@@ -1,0 +1,200 @@
+﻿@model App.Web.Models.Contact.ContactModel
+
+<script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+<script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAtiBngBbXUfQBel5lxviaw2tVU7i7oBFs&callback=initMap" async defer></script>
+
+@{
+    var addressParts = new List<string>();
+
+    if (!string.IsNullOrEmpty(Model?.Address?.Street))
+        addressParts.Add(Model.Address.Street);
+
+    if (!string.IsNullOrEmpty(Model?.Address?.City))
+        addressParts.Add(Model.Address.City);
+
+    if (!string.IsNullOrEmpty(Model?.Address?.State))
+        addressParts.Add(Model.Address.State);
+
+    if (!string.IsNullOrEmpty(Model?.Address?.Country))
+        addressParts.Add(Model.Address.Country);
+
+    if (!string.IsNullOrEmpty(Model?.Address?.ZipPostalCode))
+        addressParts.Add(Model.Address.ZipPostalCode);
+
+    var address = string.Join(", ", addressParts);
+}
+
+<div class="modal fade" id="view-contact" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="view-contact-Label" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="view-contact-Label">Edit Contact</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="frm-update-contact" class="row g-3">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <label asp-for="Name" class="form-label">Name</label>
+                            <input class="form-control" asp-for="Name">
+                            <span asp-validation-for="Name"></span>
+                        </div>
+                        <div class="col-md-4">
+                            <label asp-for="EmailAddress" class="form-label">Email</label>
+                            <input type="email" class="form-control" asp-for="EmailAddress">
+                            <span asp-validation-for="EmailAddress"></span>
+                        </div>
+                        <div class="col-md-4">
+                            <label asp-for="PhoneNumber" class="form-label">Phone</label>
+                            <input class="form-control" asp-for="PhoneNumber">
+                            <span asp-validation-for="PhoneNumber"></span>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-12">
+                            <label asp-for="Address.Street" class="form-label">Street Address</label>
+                            <textarea class="form-control" asp-for="Address.Street" placeholder="Street Address"></textarea>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-6">
+                            <label asp-for="Address.City" class="form-label">City</label>
+                            <input class="form-control" asp-for="Address.City">
+                        </div>
+                        <div class="col-6">
+                            <label asp-for="Address.State" class="form-label">State</label>
+                            <input class="form-control" asp-for="Address.State">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-6">
+                            <label asp-for="Address.Country" class="form-label">Country</label>
+                            <input class="form-control" asp-for="Address.Country">
+                        </div>
+                        <div class="col-6">
+                            <label asp-for="Address.ZipPostalCode" class="form-label">Zipcode</label>
+                            <input class="form-control" asp-for="Address.ZipPostalCode">
+                        </div>
+                    </div>
+                    <div class="row text-center mt-3">
+                        <div class="col-12">
+                            <button type="button" class="btn btn-primary" id="btn-submit-contact">Save</button>
+                            <button type="button" class="btn btn-danger" id="btn-remove-contact">Delete Contact</button>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                    @if (!string.IsNullOrWhiteSpace(address))
+                    {
+                        <style>
+                            #map {
+                                height: 500px;
+                                width: 100%;
+                            }
+                        </style>
+                        <div class="row mt-3">
+                            <div class="col-12">
+                                <div id="map"></div>
+                            </div>
+                        </div>
+                        <script>
+                            function initMap() {
+                                const address = "@Html.Raw(address)";
+
+                                const map = new google.maps.Map(document.getElementById('map'), {
+                                    zoom: 14
+                                });
+
+                                const geocoder = new google.maps.Geocoder();
+
+                                geocoder.geocode({ 'address': address }, function (results, status) {
+                                    if (status === 'OK') {
+                                        map.setCenter(results[0].geometry.location);
+                                        const marker = new google.maps.Marker({
+                                            map: map,
+                                            position: results[0].geometry.location
+                                        });
+                                    } else {
+                                        alert('Geocode was not successful for the following reason: ' + status);
+                                    }
+                                });
+                            }
+                        </script>
+                    }
+                </form>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        $("#btn-submit-contact").on('click', function () {
+            if (!($("#frm-update-contact").valid()))
+                return false;
+
+            var postData = new FormData($('#frm-update-contact')[0]);
+            postData.append("Id", parseInt('@Model.Id'));
+            //$(".se-pre-con").show();
+            $.ajax({
+                url: "@Url.Action("Update", "Contact")",
+                data: postData,
+                dataType: 'json',
+                type: 'post',
+                processData: false,
+                contentType: false,
+                success: function (response) {
+                    if (response.success) {
+                        debugger
+                        modalPopup.hide();
+                        updateTable('#contact-grid', false);
+                    }
+                    else {
+                        showNotificationMessage("Error", response.message);
+                    }
+                },
+                complete: function () {
+                    // $(".se-pre-con").hide();
+                },
+                error: function () {
+                    showNotificationMessage("Error", "Something went wrong please try after sometime.")
+                    //$(".se-pre-con").hide();
+                }
+            });
+        });
+
+        $("#btn-remove-contact").on('click', function () {
+            if (confirm("Are you sure you want to remove contact?")) { 
+                $.ajax({
+                    url: "@Url.Action("RemoveContact", "Contact")",
+                    data: {
+                        id: parseInt('@Model.Id')
+                    },
+                    dataType: 'json',
+                    type: 'post',
+                    success: function (response) {
+                        if (response.success) {
+                            modalPopup.hide();
+                            updateTable('#contact-grid', false);
+                            showNotificationMessage("Success", response.message);
+                        }
+                        else {
+                            showNotificationMessage("Error", response.message);
+                        }
+                    },
+                    complete: function () {
+                        // $(".se-pre-con").hide();
+                    },
+                    error: function () {
+                        showNotificationMessage("Error", "Something went wrong please try after sometime.")
+                        //$(".se-pre-con").hide();
+                    }
+                });
+            }
+        });
+    });
+
+</script>
