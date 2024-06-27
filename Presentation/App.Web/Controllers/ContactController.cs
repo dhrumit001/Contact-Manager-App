@@ -4,6 +4,8 @@ using App.Core.Domain.Contacts;
 using App.Web.Extensions;
 using App.Web.Models.Contact;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Mvc.Razor;
 using AutoMapper;
 
 namespace App.Web.Controllers
@@ -18,8 +20,9 @@ namespace App.Web.Controllers
         public ContactController(IContactService contactService,
             IRepository<Contact> contactRepository,
             IRepository<Address> addressRepository,
-            IMapper mapper
-            )
+            IMapper mapper,
+            IRazorViewEngine razorViewEngine
+            ) : base(razorViewEngine)
         {
             _contactService = contactService;
             _contactRepository = contactRepository;
@@ -60,49 +63,152 @@ namespace App.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(ContactModel model)
         {
+
             if (!ModelState.IsValid)
                 return View(model);
 
-            var contactEntity = new Contact
+            var contact = _mapper.Map<Contact>(model);
+            await _contactService.InsertContactAsync(contact);
+
+            if (contact.Id > 0 && !model.Address.HasEmptyAddress())
             {
-                Name = model.Name,
-                EmailAddress = model.EmailAddress,
-                PhoneNumber = model.PhoneNumber
-            };
+                var address = _mapper.Map<Address>(model.Address);
+                address.ContactId = contact.Id;
+                await _contactService.InsertAddressAsync(address);
+            }
 
-            await _contactService.InsertContactAsync(contactEntity);
-
-            ViewBag.SuccessNotification = "Contact added successfully.";
+            TempData["SuccessNotification"] = "Contact added successfully.";
             return RedirectToAction(nameof(List));
+        }
+
+        [HttpPost]
+        public async Task<JsonResult> LoadContactViewPartial(int id)
+        {
+            try
+            {
+                if (id <= 0)
+                {
+                    return Json(new
+                    {
+                        success = false,
+                        message = "Contact does not exist"
+                    });
+                }
+
+                var contact = await _contactService.GetDetailsByIdAsync(id);
+
+                if (contact == null)
+                    return Json(new
+                    {
+                        success = false,
+                        message = "Contact does not exist"
+                    });
+
+                var model = _mapper.Map<ContactModel>(contact);
+
+                return Json(new
+                {
+                    Result = RenderPartialViewToString("_LoadContactViewPartial", model),
+                    Success = true
+                });
+            }
+            catch
+            {
+                //Need to log exception here (somewhere in db or file)
+                return Json(new { success = false, message = "Something went wrong." });
+            }
         }
 
         [HttpPost]
         public async Task<IActionResult> Update(ContactModel model)
         {
-            if (!ModelState.IsValid)
-                return View(model);
+            try
+            {
+                if (!ModelState.IsValid)
+                    return Json(new { success = false, message = "Bad request." });
 
-            var contact = await _contactRepository.GetByIdAsync(model.Id);
-            contact.Name = model.Name;
-            contact.EmailAddress = model.EmailAddress;
-            contact.PhoneNumber = model.PhoneNumber;
+                var contact = await _contactService.GetDetailsByIdAsync(model.Id);
 
-            await _contactService.UpdateContactAsync(contact);
+                if (contact is null)
+                    return Json(new
+                    {
+                        success = false,
+                        message = "Contact does not exist"
+                    });
 
-            ViewBag.SuccessNotification = "Contact updated successfully.";
-            return RedirectToAction(nameof(List));
+                contact.Name = model.Name;
+                contact.EmailAddress = model.EmailAddress;
+                contact.PhoneNumber = model.PhoneNumber;
+
+                await _contactService.UpdateContactAsync(contact);
+                model.Address.ContactId = contact.Id;
+                await InsertUpdateAddress(model.Address, contact?.ContactAddress);
+
+                return Json(new
+                {
+                    success = true,
+                    message = "Contact updated successfully."
+                });
+            }
+            catch
+            {
+                //Need to log exception here (somewhere in db or file)
+                return Json(new { success = false, message = "Something went wrong." });
+            }
         }
 
-        public async Task<IActionResult> View(int id)
+        [HttpPost]
+        public async Task<IActionResult> RemoveContact(int id)
         {
-            var contact = await _contactService.GetContactDetailsByIdAsync(id);
+            try
+            {
+                var contact = await _contactService.GetDetailsByIdAsync(id);
 
-            return View();
+                if (contact is null)
+                    return Json(new
+                    {
+                        success = false,
+                        message = "Contact does not exist"
+                    });
+
+                await _contactService.DeleteContactAsync(contact);
+
+                return Json(new
+                {
+                    success = true,
+                    message = "Contact removed successfully."
+                });
+            }
+            catch
+            {
+                //Need to log exception here (somewhere in db or file)
+                return Json(new { success = false, message = "Something went wrong." });
+            }
         }
 
         #endregion
 
         #region Utilities()
+
+        public async Task InsertUpdateAddress(ContactAddressModel model, Address address)
+        {
+            if ((!model.HasEmptyAddress() && address is not null)
+                || model.HasEmptyAddress() && address is not null)
+            {
+                address.Street = model?.Street;
+                address.City = model?.City;
+                address.State = model?.State;
+                address.Country = model?.Country;
+                address.ZipPostalCode = model?.ZipPostalCode;
+
+                await _contactService.UpdateAddressAsync(address);
+            }
+            else if (!model.HasEmptyAddress() && address is null)
+            {
+                var addressEntity = _mapper.Map<Address>(model);
+                await _contactService.InsertAddressAsync(addressEntity);
+            }
+        }
 
         public async Task<ContactListModel> PrepareContactListModel(ContactSearchModel searchModel)
         {
@@ -121,14 +227,7 @@ namespace App.Web.Controllers
             {
                 return contacts.Select(contact =>
                 {
-                    //fill in model values from the entity
-                    var contactModel = new ContactModel();
-
-                    contactModel.Id = contact.Id;
-                    contactModel.EmailAddress = contact.EmailAddress;
-                    contactModel.PhoneNumber = contact.PhoneNumber;
-                    contactModel.Name = contact.Name;
-
+                    var contactModel = _mapper.Map<ContactModel>(contact);
                     return contactModel;
                 });
             });

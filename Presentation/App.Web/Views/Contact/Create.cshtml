@@ -1,0 +1,87 @@
+﻿@model App.Web.Models.Contact.ContactModel
+@{
+    ViewData["Title"] = "Create Contact";
+    Layout = "~/Views/shared/_layout.cshtml";
+}
+
+@await Html.PartialAsync("_ValidationScriptsPartial")
+
+
+<div class="container card-container">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <form asp-action="Create" asp-controller="Contact" class="row g-3">
+                        <div class="row mb-3 mt-3">
+                            <div class="col-12 text-start">
+                                <h3>
+                                    Contact Information
+                                </h3>
+                            </div>
+                            <hr />
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-md-4">
+                                <label asp-for="Name" class="form-label">Name <span class="text-danger">*</span></label>
+                                <input class="form-control" asp-for="Name">
+                                <span asp-validation-for="Name"></span>
+                            </div>
+                            <div class="col-md-4">
+                                <label asp-for="EmailAddress" class="form-label">Email <span class="text-danger">*</span></label>
+                                <input type="email" class="form-control" asp-for="EmailAddress">
+                                <span asp-validation-for="EmailAddress"></span>
+                            </div>
+                            <div class="col-md-4">
+                                <label asp-for="PhoneNumber" class="form-label">Phone <span class="text-danger">*</span></label>
+                                <input class="form-control" asp-for="PhoneNumber">
+                                <span asp-validation-for="PhoneNumber"></span>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3 mt-3">
+                            <div class="col-12 text-start">
+                                <h3>
+                                    Contact Address
+                                </h3>
+                            </div>
+                            <hr />
+                        </div>
+
+                        <div class="row mb-2">
+                            <div class="col-12">
+                                <label asp-for="Address.Street" class="form-label">Street Address</label>
+                                <textarea class="form-control" asp-for="Address.Street" placeholder="Street Address"></textarea>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-3">
+                                <label asp-for="Address.City" class="form-label">City</label>
+                                <input class="form-control" asp-for="Address.City">
+                            </div>
+                            <div class="col-3">
+                                <label asp-for="Address.State" class="form-label">State</label>
+                                <input class="form-control" asp-for="Address.State">
+                            </div>
+                            <div class="col-3">
+                                <label asp-for="Address.Country" class="form-label">Country</label>
+                                <input class="form-control" asp-for="Address.Country">
+                            </div>
+                            <div class="col-3">
+                                <label asp-for="Address.ZipPostalCode" class="form-label">Zipcode</label>
+                                <input class="form-control" asp-for="Address.ZipPostalCode">
+                                <span asp-validation-for="Address.ZipPostalCode"></span>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <button type="submit" class="btn btn-primary">Submit</button>
+                            <a asp-action="List" asp-controller="Contact" class="btn btn-danger">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</div>
