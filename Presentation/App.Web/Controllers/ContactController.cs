@@ -63,40 +63,38 @@ namespace App.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(ContactModel model)
         {
+
             if (!ModelState.IsValid)
                 return View(model);
 
-            var contactEntity = new Contact
-            {
-                Name = model.Name,
-                EmailAddress = model.EmailAddress,
-                PhoneNumber = model.PhoneNumber
-            };
+            var contact = _mapper.Map<Contact>(model);
+            await _contactService.InsertContactAsync(contact);
 
-            await _contactService.InsertContactAsync(contactEntity);
-            if(contactEntity.Id > 0)
+            if (contact.Id > 0 && !model.Address.HasEmptyAddress())
             {
-                await _contactService.InsertAddressAsync(new Address()
-                {
-                    ContactId = contactEntity.Id,
-                    Street = model.Address?.Street,
-                    City = model?.Address?.City,
-                    State = model?.Address?.State,
-                    Country = model?.Address?.Country,
-                    ZipPostalCode = model.Address?.ZipPostalCode
-                });
+                var address = _mapper.Map<Address>(model.Address);
+                address.ContactId = contact.Id;
+                await _contactService.InsertAddressAsync(address);
             }
 
-            ViewBag.SuccessNotification = "Contact added successfully.";
+            TempData["SuccessNotification"] = "Contact added successfully.";
             return RedirectToAction(nameof(List));
         }
 
         [HttpPost]
         public async Task<JsonResult> LoadContactViewPartial(int id)
         {
-
-            if(id > 0)
+            try
             {
+                if (id <= 0)
+                {
+                    return Json(new
+                    {
+                        success = false,
+                        message = "Contact does not exist"
+                    });
+                }
+
                 var contact = await _contactService.GetDetailsByIdAsync(id);
 
                 if (contact == null)
@@ -114,89 +112,103 @@ namespace App.Web.Controllers
                     Success = true
                 });
             }
-
-            return Json(new
+            catch
             {
-                success = false,
-                message = "Contact does not exist"
-            });
+                //Need to log exception here (somewhere in db or file)
+                return Json(new { success = false, message = "Something went wrong." });
+            }
         }
 
         [HttpPost]
         public async Task<IActionResult> Update(ContactModel model)
         {
-            if (!ModelState.IsValid)
-                return View(model);
+            try
+            {
+                if (!ModelState.IsValid)
+                    return Json(new { success = false, message = "Bad request." });
 
-            var contact = await _contactService.GetDetailsByIdAsync(model.Id);
+                var contact = await _contactService.GetDetailsByIdAsync(model.Id);
 
-            if(contact is null)
+                if (contact is null)
+                    return Json(new
+                    {
+                        success = false,
+                        message = "Contact does not exist"
+                    });
+
+                contact.Name = model.Name;
+                contact.EmailAddress = model.EmailAddress;
+                contact.PhoneNumber = model.PhoneNumber;
+
+                await _contactService.UpdateContactAsync(contact);
+                model.Address.ContactId = contact.Id;
+                await InsertUpdateAddress(model.Address, contact?.ContactAddress);
+
                 return Json(new
                 {
-                    success = false,
-                    message = "Contact does not exist"
-                });
-
-            contact.Name = model.Name;
-            contact.EmailAddress = model.EmailAddress;
-            contact.PhoneNumber = model.PhoneNumber;
-
-            await _contactService.UpdateContactAsync(contact);
-
-            if(contact?.ContactAddress is not null)
-            {
-                contact.ContactAddress.Street = model?.Address?.Street;
-                contact.ContactAddress.City = model?.Address?.City;
-                contact.ContactAddress.State = model?.Address?.State;
-                contact.ContactAddress.Country = model?.Address?.Country;
-                contact.ContactAddress.ZipPostalCode = model?.Address?.ZipPostalCode;
-
-                await _contactService.UpdateAddressAsync(contact.ContactAddress);
-            }
-            else
-            {
-                await _contactService.InsertAddressAsync(new Address()
-                {
-                    ContactId = contact.Id,
-                    Street = model.Address?.Street,
-                    City = model?.Address?.City,
-                    State = model?.Address?.State,
-                    Country = model?.Address?.Country,
-                    ZipPostalCode = model.Address?.ZipPostalCode
+                    success = true,
+                    message = "Contact updated successfully."
                 });
             }
-            return Json(new
+            catch
             {
-                success = true,
-                message = "Contact updated successfully."
-            });
+                //Need to log exception here (somewhere in db or file)
+                return Json(new { success = false, message = "Something went wrong." });
+            }
         }
 
         [HttpPost]
         public async Task<IActionResult> RemoveContact(int id)
         {
-            var contact = await _contactService.GetDetailsByIdAsync(id);
+            try
+            {
+                var contact = await _contactService.GetDetailsByIdAsync(id);
 
-            if (contact is null)
+                if (contact is null)
+                    return Json(new
+                    {
+                        success = false,
+                        message = "Contact does not exist"
+                    });
+
+                await _contactService.DeleteContactAsync(contact);
+
                 return Json(new
                 {
-                    success = false,
-                    message = "Contact does not exist"
+                    success = true,
+                    message = "Contact removed successfully."
                 });
-
-            await _contactService.DeleteContactAsync(contact);
-
-            return Json(new
+            }
+            catch
             {
-                success = true,
-                message = "Contact removed successfully."
-            });
+                //Need to log exception here (somewhere in db or file)
+                return Json(new { success = false, message = "Something went wrong." });
+            }
         }
-
 
         #endregion
 
         #region Utilities()
+
+        public async Task InsertUpdateAddress(ContactAddressModel model, Address address)
+        {
+            if ((!model.HasEmptyAddress() && address is not null)
+                || model.HasEmptyAddress() && address is not null)
+            {
+                address.Street = model?.Street;
+                address.City = model?.City;
+                address.State = model?.State;
+                address.Country = model?.Country;
+                address.ZipPostalCode = model?.ZipPostalCode;
+
+                await _contactService.UpdateAddressAsync(address);
+            }
+            else if (!model.HasEmptyAddress() && address is null)
+            {
+                var addressEntity = _mapper.Map<Address>(model);
+                await _contactService.InsertAddressAsync(addressEntity);
+            }
+        }
 
         public async Task<ContactListModel> PrepareContactListModel(ContactSearchModel searchModel)
         {
@@ -215,14 +227,7 @@ namespace App.Web.Controllers
             {
                 return contacts.Select(contact =>
                 {
-                    //fill in model values from the entity
-                    var contactModel = new ContactModel();
-
-                    contactModel.Id = contact.Id;
-                    contactModel.EmailAddress = contact.EmailAddress;
-                    contactModel.PhoneNumber = contact.PhoneNumber;
-                    contactModel.Name = contact.Name;
-
+                    var contactModel = _mapper.Map<ContactModel>(contact);
                     return contactModel;
                 });
             });

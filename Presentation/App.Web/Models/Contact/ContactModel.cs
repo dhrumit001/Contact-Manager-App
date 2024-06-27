@@ -7,11 +7,6 @@ namespace App.Web.Models.Contact
     /// </summary>
     public record ContactModel : BaseEntityModel
     {
-        public ContactModel()
-        {
-            Address = new ContactAddressModel();
-        }
-
         [Required(ErrorMessage ="Name is required")]
         public string Name { get; set; }
 
