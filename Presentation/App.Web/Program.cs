@@ -1,6 +1,9 @@
+using App.Data;
+using App.Data.Repository;
+using App.Services.Contacts;
+using Microsoft.EntityFrameworkCore;
 
-
-namespace LearnProject.Web
+namespace App.Web
 {
     public class Program
     {

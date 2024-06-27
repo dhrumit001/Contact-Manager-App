@@ -15,15 +15,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Controllers\" />
-    <Folder Include="Extensions\" />
-    <Folder Include="Models\" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\..\Libraries\App.Core\App.Core.csproj" />
-    <ProjectReference Include="..\..\Libraries\App.Data\App.Data.csproj" />
-    <ProjectReference Include="..\..\Libraries\App.Services\App.Services.csproj" />
+    <ProjectReference Include="..\..\Libraries\LearnProject.Data\LearnProject.Data.csproj" />
+    <ProjectReference Include="..\..\Libraries\LearnProject.Services\LearnProject.Services.csproj" />
   </ItemGroup>
 
 </Project>
