@@ -36,7 +36,7 @@ namespace App.Core.Domain.Contacts
 
         #region Navigation Properties
 
-        private IList<Address>? _contactAddresses;
+        private IList<Address> _contactAddresses;
 
         /// <summary>
         /// Gets all addresses of contact

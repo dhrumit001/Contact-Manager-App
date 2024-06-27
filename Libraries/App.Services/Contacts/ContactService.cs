@@ -65,7 +65,7 @@ namespace App.Services.Contacts
         /// The task result contains the contacts
         /// </returns>
         public async Task<IPagedList<Contact>> GetAllContactsAsync(
-            string? emailAddress = null, string? name = null, string? phoneNumber = null,
+            string emailAddress = null, string name = null, string phoneNumber = null,
             int pageIndex = 0, int pageSize = int.MaxValue, bool getOnlyTotalCount = false)
         {
             var customers = await _contactRepository.GetAllPagedAsync(query =>
