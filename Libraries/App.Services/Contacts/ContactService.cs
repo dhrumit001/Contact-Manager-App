@@ -45,7 +45,7 @@ namespace App.Services.Contacts
         public async Task<Contact> GetContactDetailsByIdAsync(int id)
         {
             var contact = await _contactRepository.Table
-                .Include(s => s.ContactAddresses)
+                .Include(s => s.ContactAddress)
                 .SingleOrDefaultAsync(x => x.Id == id);
 
             return contact;
@@ -133,9 +133,6 @@ namespace App.Services.Contacts
         /// <returns>A task that represents the asynchronous operation</returns>
         public Task InsertAddressAsync(Address address)
         {
-            if (!CanAddAddress(address))
-                throw new Exception("Add address limit exceeds.");
-
             return _addressRepository.InsertAsync(address);
         }
 
@@ -147,19 +144,6 @@ namespace App.Services.Contacts
         public Task UpdateAddressAsync(Address address)
         {
             return _addressRepository.UpdateAsync(address);
-        }
-
-        /// <summary>
-        /// Validate add address (as per business logic)
-        /// </summary>
-        /// <param name="address">Address</param>
-        /// <returns>return true in case of allow to add address otherwise false</returns>
-        public bool CanAddAddress(Address address)
-        {
-            if (address?.Contact?.ContactAddresses?.Count > 2)
-                return false;
-
-            return true;
         }
 
         #endregion

@@ -3,7 +3,6 @@
 
 namespace App.Core.Domain.Contacts
 {
-    [Table(nameof(Address))]
     public class Address : BaseEntity
     {
         #region Fields

@@ -78,13 +78,6 @@ namespace App.Services.Contacts
         /// <returns>A task that represents the asynchronous operation</returns>
         Task UpdateAddressAsync(Address address);
 
-        /// <summary>
-        /// Validate add address (as per business logic)
-        /// </summary>
-        /// <param name="address">Address</param>
-        /// <returns>return true in case of allow to add address otherwise false</returns>
-        bool CanAddAddress(Address address);
-
         #endregion
     }
 }

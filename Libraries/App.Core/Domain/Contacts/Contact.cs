@@ -36,15 +36,10 @@ namespace App.Core.Domain.Contacts
 
         #region Navigation Properties
 
-        private IList<Address> _contactAddresses;
-
         /// <summary>
-        /// Gets all addresses of contact
+        /// Gets addresse of contact
         /// </summary>
-        public virtual IList<Address> ContactAddresses
-        {
-            get => _contactAddresses ?? new List<Address>();
-        }
+        public virtual Address ContactAddress { get; }
 
         #endregion
 
