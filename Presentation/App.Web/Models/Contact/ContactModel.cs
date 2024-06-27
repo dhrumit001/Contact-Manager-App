@@ -9,7 +9,7 @@ namespace App.Web.Models.Contact
     {
         public ContactModel()
         {
-            Addresses = new List<ContactAddressModel>();
+            Address = new ContactAddressModel();
         }
 
         [Required(ErrorMessage ="Name is required")]
@@ -23,6 +23,6 @@ namespace App.Web.Models.Contact
         [EmailAddress(ErrorMessage = "Enter valid email")]
         public string EmailAddress { get; set; }
 
-        public List<ContactAddressModel> Addresses { get; set; }
+        public ContactAddressModel Address { get; set; }
     }
 }

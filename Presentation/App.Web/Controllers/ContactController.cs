@@ -4,6 +4,8 @@ using App.Core.Domain.Contacts;
 using App.Web.Extensions;
 using App.Web.Models.Contact;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Mvc.Razor;
 
 namespace App.Web.Controllers
 {
@@ -15,8 +17,9 @@ namespace App.Web.Controllers
 
         public ContactController(IContactService contactService,
             IRepository<Contact> contactRepository,
-            IRepository<Address> addressRepository
-            )
+            IRepository<Address> addressRepository,
+            IRazorViewEngine razorViewEngine
+            ) : base(razorViewEngine)
         {
             _contactService = contactService;
             _contactRepository = contactRepository;
@@ -67,9 +70,45 @@ namespace App.Web.Controllers
             };
 
             await _contactService.InsertContactAsync(contactEntity);
+            if(contactEntity.Id > 0)
+            {
+                await _contactService.InsertAddressAsync(new Address()
+                {
+                    ContactId = contactEntity.Id,
+                    Street = model.Address?.Street,
+                    City = model?.Address?.City,
+                    State = model?.Address?.State,
+                    Country = model?.Address?.Country,
+                    ZipPostalCode = model.Address?.ZipPostalCode
+                });
+            }
 
             ViewBag.SuccessNotification = "Contact added successfully.";
             return RedirectToAction(nameof(List));
+        }
+
+        [HttpPost]
+        public async Task<JsonResult> LoadContactViewPartial(int id)
+        {
+
+            if(id > 0)
+            {
+                var contact = await _contactService.GetContactDetailsByIdAsync(id);
+
+                if (contact == null)
+                    return Json(new
+                    {
+                        success = false,
+                        message = "Contact does not exist"
+                    });
+
+
+                return Json(new
+                {
+                    Result = RenderPartialViewToString("_LoadContactViewPartial", model),
+                    Success = true
+                });
+            }
         }
 
         [HttpPost]
