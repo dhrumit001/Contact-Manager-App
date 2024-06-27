@@ -14,11 +14,59 @@ namespace App.Data
     /// <typeparam name="TEntity">Entity type</typeparam>
     public static class ModelBuilderExtensions
     {
+        /// <summary>
+        /// Methods to add prepopulate some data on database
+        /// </summary>
+        /// <param name="modelBuilder"></param>
         public static void Seed(this ModelBuilder modelBuilder)
         {
-            // Seed contact
+            // Seed contact data
             modelBuilder.Entity<Contact>().HasData(
-                new Contact { Id = 1, Name = "Dhrumit", PhoneNumber = "8000191594", EmailAddress = "pateldhrumit7@gmail.com" }
+                new Contact
+                {
+                    Id = 1,
+                    Name = "Dhrumit",
+                    PhoneNumber = "8000191594",
+                    EmailAddress = "pateldhrumit7@gmail.com",
+                },
+                new Contact
+                {
+                    Id = 2,
+                    Name = "Dharmesh",
+                    PhoneNumber = "8000191595",
+                    EmailAddress = "dharmesh.vasani1990@gmail.com",
+                },
+                new Contact
+                {
+                    Id = 3,
+                    Name = "Ajay",
+                    PhoneNumber = "8000191596",
+                    EmailAddress = "ajay.chauhan@gmail.com"
+                }
+            );
+
+            // Seed contact address
+            modelBuilder.Entity<Contact>().HasData(
+                new Address
+                {
+                    Id = 1,
+                    ContactId = 1,
+                    Country = "India",
+                    State = "Gujarat",
+                    City = "Surat",
+                    Street = "Shrushti Residency,Kosad,Amroli",
+                    ZipPostalCode = "394107"
+                },
+                new Address
+                {
+                    Id = 2,
+                    ContactId = 2,
+                    Country = "India",
+                    State = "Gujarat",
+                    City = "Surat",
+                    Street = "Kiran Pearl,Kosad,Amroli",
+                    ZipPostalCode = "394107"
+                }
             );
         }
     }
