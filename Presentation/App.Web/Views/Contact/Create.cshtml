@@ -1,0 +1,79 @@
+﻿@model App.Web.Models.Contact.ContactModel
+@{
+    ViewData["Title"] = "Create Contact";
+    Layout = "~/Views/shared/_layout.cshtml";
+}
+
+@await Html.PartialAsync("_ValidationScriptsPartial")
+
+<div class="container card-container">
+    <div class="row">
+        <h3>
+            Create Contact
+        </h3>
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <form asp-action="Create" asp-controller="Contact" class="row g-3">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <label asp-for="Name" class="form-label">Name</label>
+                                <input class="form-control" asp-for="Name">
+                                <span asp-validation-for="Name"></span>
+                            </div>
+                            <div class="col-md-4">
+                                <label asp-for="EmailAddress" class="form-label">Email</label>
+                                <input type="email" class="form-control" asp-for="EmailAddress">
+                                <span asp-validation-for="EmailAddress"></span>
+                            </div>
+                            <div class="col-md-4">
+                                <label asp-for="PhoneNumber" class="form-label">Phone</label>
+                                <input class="form-control" asp-for="PhoneNumber">
+                                <span asp-validation-for="PhoneNumber"></span>
+                            </div>
+                        </div>
+                        
+                        @* <div class="col-12">
+                            <label for="inputAddress" class="form-label">Address</label>
+                            <input type="text" class="form-control" id="inputAddress" placeholder="1234 Main St">
+                        </div>
+                        <div class="col-12">
+                            <label for="inputAddress2" class="form-label">Address 2</label>
+                            <input type="text" class="form-control" id="inputAddress2" placeholder="Apartment, studio, or floor">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="inputCity" class="form-label">City</label>
+                            <input type="text" class="form-control" id="inputCity">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="inputState" class="form-label">State</label>
+                            <select id="inputState" class="form-select">
+                                <option selected>Choose...</option>
+                                <option>...</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label for="inputZip" class="form-label">Zip</label>
+                            <input type="text" class="form-control" id="inputZip">
+                        </div>
+                        <div class="col-12">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="gridCheck">
+                                <label class="form-check-label" for="gridCheck">
+                                    Check me out
+                                </label>
+                            </div>
+                        </div> *@
+                        <div class="col-12">
+                            <button type="submit" class="btn btn-primary">Submit</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+    
+</div>
