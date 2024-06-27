@@ -97,6 +97,9 @@ namespace App.Services.Contacts
         /// <returns>A task that represents the asynchronous operation</returns>
         public Task InsertContactAsync(Contact contact)
         {
+            if(contact == null)
+                throw new ArgumentNullException(nameof(contact));
+
             contact.CreatedOnUtc = DateTime.UtcNow;
             return _contactRepository.InsertAsync(contact);
         }
@@ -108,6 +111,9 @@ namespace App.Services.Contacts
         /// <returns>A task that represents the asynchronous operation</returns>
         public Task UpdateContactAsync(Contact contact)
         {
+            if (contact == null)
+                throw new ArgumentNullException(nameof(contact));
+
             contact.UpdatedOnUtc = DateTime.UtcNow;
             return _contactRepository.UpdateAsync(contact);
         }
@@ -119,6 +125,9 @@ namespace App.Services.Contacts
         /// <returns>A task that represents the asynchronous operation</returns>
         public Task DeleteContactAsync(Contact contact)
         {
+            if (contact == null)
+                throw new ArgumentNullException(nameof(contact));
+
             return _contactRepository.DeleteAsync(contact);
         }
 
@@ -133,6 +142,9 @@ namespace App.Services.Contacts
         /// <returns>A task that represents the asynchronous operation</returns>
         public Task InsertAddressAsync(Address address)
         {
+            if (address == null)
+                throw new ArgumentNullException(nameof(address));
+
             return _addressRepository.InsertAsync(address);
         }
 
@@ -143,6 +155,9 @@ namespace App.Services.Contacts
         /// <returns>A task that represents the asynchronous operation</returns>
         public Task UpdateAddressAsync(Address address)
         {
+            if (address == null)
+                throw new ArgumentNullException(nameof(address));
+
             return _addressRepository.UpdateAsync(address);
         }
 

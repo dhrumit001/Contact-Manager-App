@@ -28,6 +28,7 @@ namespace App.Data
                     Name = "Dhrumit",
                     PhoneNumber = "8000191594",
                     EmailAddress = "pateldhrumit7@gmail.com",
+                    CreatedOnUtc = DateTime.UtcNow,
                 },
                 new Contact
                 {
@@ -35,18 +36,20 @@ namespace App.Data
                     Name = "Dharmesh",
                     PhoneNumber = "8000191595",
                     EmailAddress = "dharmesh.vasani1990@gmail.com",
+                    CreatedOnUtc = DateTime.UtcNow,
                 },
                 new Contact
                 {
                     Id = 3,
                     Name = "Ajay",
                     PhoneNumber = "8000191596",
-                    EmailAddress = "ajay.chauhan@gmail.com"
+                    EmailAddress = "ajay.chauhan@gmail.com",
+                    CreatedOnUtc = DateTime.UtcNow,
                 }
             );
 
             // Seed contact address
-            modelBuilder.Entity<Contact>().HasData(
+            modelBuilder.Entity<Address>().HasData(
                 new Address
                 {
                     Id = 1,
