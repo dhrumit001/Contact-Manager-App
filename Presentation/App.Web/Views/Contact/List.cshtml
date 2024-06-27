@@ -5,6 +5,15 @@
     Layout = "~/Views/shared/_layout.cshtml";
 }
 
+@if (TempData["SuccessNotification"] != null)
+{
+    <script>
+        $(document).ready(function () {
+            showNotificationMessage("Success", '@Html.Raw(TempData["SuccessNotification"])')
+        })
+    </script>
+}
+
 <div class="container card-container">
 
     <div class="row mb-3">

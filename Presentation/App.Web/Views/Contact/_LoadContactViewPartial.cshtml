@@ -76,6 +76,7 @@
                         <div class="col-6">
                             <label asp-for="Address.ZipPostalCode" class="form-label">Zipcode</label>
                             <input class="form-control" asp-for="Address.ZipPostalCode">
+                            <span asp-validation-for="Address.ZipPostalCode"></span>
                         </div>
                     </div>
                     <div class="row text-center mt-3">
@@ -95,6 +96,7 @@
                         </style>
                         <div class="row mt-3">
                             <div class="col-12">
+                                <span id="map-error" style="color:red"></span>
                                 <div id="map"></div>
                             </div>
                         </div>
@@ -110,13 +112,14 @@
 
                                 geocoder.geocode({ 'address': address }, function (results, status) {
                                     if (status === 'OK') {
+                                        $("#map-error").text("");
                                         map.setCenter(results[0].geometry.location);
                                         const marker = new google.maps.Marker({
                                             map: map,
                                             position: results[0].geometry.location
                                         });
                                     } else {
-                                        alert('Geocode was not successful for the following reason: ' + status);
+                                        $("#map-error").text("Map error : Geocode was not successful for the following reason: Invalid address")
                                     }
                                 });
                             }
@@ -148,16 +151,16 @@
                 contentType: false,
                 success: function (response) {
                     if (response.success) {
-                        debugger
                         modalPopup.hide();
                         updateTable('#contact-grid', false);
+                        showNotificationMessage("Success", response.message);
                     }
                     else {
                         showNotificationMessage("Error", response.message);
                     }
                 },
                 complete: function () {
-                     $(".se-pre-con").hide();
+                    $(".se-pre-con").hide();
                 },
                 error: function () {
                     showNotificationMessage("Error", "Something went wrong please try after sometime.")
@@ -167,7 +170,7 @@
         });
 
         $("#btn-remove-contact").on('click', function () {
-            if (confirm("Are you sure you want to remove contact?")) { 
+            if (confirm("Are you sure you want to remove contact?")) {
                 $(".se-pre-con").show();
                 $.ajax({
                     url: "@Url.Action("RemoveContact", "Contact")",
@@ -187,7 +190,7 @@
                         }
                     },
                     complete: function () {
-                         $(".se-pre-con").hide();
+                        $(".se-pre-con").hide();
                     },
                     error: function () {
                         showNotificationMessage("Error", "Something went wrong please try after sometime.")

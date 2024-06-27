@@ -6,14 +6,6 @@
 
 @await Html.PartialAsync("_ValidationScriptsPartial")
 
-@if (ViewBag.SuccessNotification != null)
-{
-    <script>
-        $(document).ready(function () {
-            showNotificationMessage("Success", '@Html.Raw(ViewBag.SuccessNotification)')
-        })
-    </script>
-}
 
 <div class="container card-container">
     <div class="row">
@@ -78,6 +70,7 @@
                             <div class="col-3">
                                 <label asp-for="Address.ZipPostalCode" class="form-label">Zipcode</label>
                                 <input class="form-control" asp-for="Address.ZipPostalCode">
+                                <span asp-validation-for="Address.ZipPostalCode"></span>
                             </div>
                         </div>
                         <div class="col-12">
