@@ -24,7 +24,8 @@ namespace App.Data.Mappings
             builder.Property(s => s.Name).IsRequired().HasMaxLength(100);
             builder.Property(s => s.EmailAddress).IsRequired().HasMaxLength(100);
             builder.Property(s => s.PhoneNumber).IsRequired().HasMaxLength(100);
-
+            builder.Property(s => s.CreatedOnUtc).HasColumnType("datetime");
+            builder.Property(s => s.UpdatedOnUtc).HasColumnType("datetime");
             builder.HasOne(c => c.ContactAddress)
                 .WithOne(e => e.Contact);
         }
